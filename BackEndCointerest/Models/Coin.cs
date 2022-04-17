@@ -14,6 +14,7 @@ namespace BackEndCointerest.Models
         private string coin_picture;
         private List<Coin_update> price_history;
 
+
         public Coin()
         {
 

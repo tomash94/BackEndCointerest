@@ -1,5 +1,5 @@
 ﻿using BackEndCointerest.Models;
-using Microsoft.AspNetCore.Cors;
+
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

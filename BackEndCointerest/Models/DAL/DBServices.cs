@@ -136,7 +136,7 @@ namespace BackEndCointerest.Models.DAL
 
         }
 
-
+       
 
         public int Insert(object obj)
         {
@@ -200,12 +200,12 @@ namespace BackEndCointerest.Models.DAL
             {
                 Coin_update c_update = (Coin_update)obj;
                 // use a string builder to create the dynamic string
-                sb.AppendFormat("Values('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}',", c_update.Coin_name, c_update.Coin_value, c_update.Symbol, c_update.Percent_change_1h, c_update.Percent_change_24h, c_update.Percent_change_7d, c_update.Percent_change_30d );
+                sb.AppendFormat("Values('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}',", c_update.Coin_name, c_update.Coin_value, c_update.Symbol, c_update.Percent_change_1h, c_update.Percent_change_24h, c_update.Percent_change_7d, c_update.Percent_change_30d);
                 String prefix = "INSERT INTO Coin_Updates_2022 " + "([coin_name],[coin_value],[symbol],[p_change_1h],[p_change_24h],[p_change_7d],[p_change_30d],[update_time])";
                 command = prefix + sb.ToString() + "convert(datetime, '" + c_update.Update_date.ToString("yyyy-MM-dd HH:mm:ss.fff") + "'))";
             }
 
-            if(obj is Transaction)
+            if (obj is Transaction)
             {
                 Transaction trans = (Transaction)obj;
                 sb.AppendFormat("Values('{0}', '{1}', '{2}', '{3}', '{4}',", trans.Email, trans.Coin_name, trans.Coin_amount, trans.Dollar_amount, trans.Comment);
@@ -213,12 +213,40 @@ namespace BackEndCointerest.Models.DAL
                 command = prefix + sb.ToString() + "convert(datetime, '" + trans.T_date.ToString("yyyy-MM-dd HH:mm:ss.fff") + "'))";
             }
 
-            if(obj is Asset)
+            if (obj is Asset)
             {
                 Asset ast = (Asset)obj;
                 sb.AppendFormat("Values('{0}', '{1}', '{2}')", ast.Email, ast.Coin_name, ast.Amount);
                 String prefix = "INSERT INTO Assets_2022 " + "([email], [coin_name], [amount])";
                 command = prefix + sb.ToString();
+            }
+
+            if (obj is Prediction)
+            {
+                Prediction p = (Prediction)obj;
+                String prefix;
+                if (p.X_current_price == -1)
+                {
+                    
+                    prefix = "UPDATE Predictions_2022 set y_true_price =" +p.Y_true_price+ "where coin_name='"+p.Coin_name+ "' And y_time IN (SELECT max(y_time) FROM Predictions_2022 )";
+                    command = prefix;
+                }
+                else
+                {
+
+                    sb.AppendFormat("Values('{0}', '{1}', '{2}',", p.Coin_name, p.Predicted_price, p.X_current_price);
+                    prefix = "INSERT INTO Predictions_2022 " + "([coin_name], [predicted_price], [x_current_price], [x_time], [y_time] )";
+                    command = prefix + sb.ToString() + "convert(datetime, '" + p.X_time.ToString("yyyy-MM-dd HH:mm:ss.fff") + "')" + ", convert(datetime, '" + p.Y_time.ToString("yyyy-MM-dd HH:mm:ss.fff") + "')) ";
+                }
+            }
+
+            if(obj is Tweet)
+            {
+                Tweet t = (Tweet)obj;
+                sb.AppendFormat("Values('{0}', '{1}', '{2}', '{3}', '{4}',",t.Tweet_id, t.Author, t.Comp_score, t.Engagement, t.Tweet_text);
+                String prefix = "INSERT INTO Cointerest_Tweets_2022 " + "([tweet_id], [author], [comp_score], [engagement], [tweet_text], [tweet_time])";
+                command = prefix + sb.ToString() + " convert(datetime, '" + t.Tweet_time.ToString("yyyy-MM-dd HH:mm:ss.fff") + "'))";
+
             }
 
             return command;
@@ -274,6 +302,45 @@ namespace BackEndCointerest.Models.DAL
                     // close the db connection
                     con.Close();
                 }
+            }
+
+        }
+
+        public int login(string email, DateTime time)
+        {
+
+            SqlConnection con = null;
+
+            try
+            {
+
+                con = connect("DBConnectionString");
+
+                String command = "";
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat("Values('{0}', ", email);
+                String prefix = "INSERT INTO Logins_2022 " + "([email],[time])";
+                command = prefix + sb.ToString() + "convert(datetime, '" + time.ToString("yyyy-MM-dd HH:mm:ss.fff") + "'))";
+
+                SqlCommand cmd = new SqlCommand(command, con);
+
+                // get a reader
+                int numEffected = cmd.ExecuteNonQuery(); // execute the command
+                return numEffected;
+                
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+
             }
 
         }
@@ -620,7 +687,154 @@ namespace BackEndCointerest.Models.DAL
 
         }
 
+        public List<Prediction> get_predictions(string coin_name)
+        {
+            SqlConnection con = null;
+            List<Prediction> p_list = new List<Prediction>();
 
+            try
+            {
+                con = connect("DBConnectionString");
+                String selectSTR;
+                if (coin_name == null || coin_name == " ")
+                {
+                    selectSTR = "SELECT * FROM Predictions_2022";
+                }
+                else selectSTR = "SELECT * FROM Predictions_2022 WHERE coin_name = '" + coin_name + "'";
+
+                SqlCommand cmd = new SqlCommand(selectSTR, con);
+
+                // get a reader
+                SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+
+                while (dr.Read())
+                {
+                    Prediction p = new Prediction();
+                    p.Coin_name = dr["coin_name"] as string;
+                    p.Predicted_price = (float)(double)dr["predicted_price"];
+                    p.X_time = (DateTime)dr["x_time"];
+                    p.Y_time = (DateTime)dr["y_time"];
+                    p.X_current_price = (float)(double)dr["x_current_price"];
+
+                    if(dr["y_true_price"] !=  System.DBNull.Value)
+                    {
+                        p.Y_true_price = (float)(double)dr["y_true_price"];
+                    }
+                    p_list.Add(p);
+
+                }
+                return p_list;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+
+            }
+        }
+
+        public List<Tweet> get_tweets()
+        {
+            SqlConnection con = null;
+            List<Tweet> t_list = new List<Tweet>();
+
+            try
+            {
+                con = connect("DBConnectionString");
+                String selectSTR;
+                
+                selectSTR = "SELECT * FROM Cointerest_Tweets_2022";
+
+                SqlCommand cmd = new SqlCommand(selectSTR, con);
+
+                // get a reader
+                SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+
+                while (dr.Read())
+                {
+                    Tweet t = new Tweet();
+                    t.Tweet_id = dr["tweet_id"] as string;
+                    t.Author = dr["author"] as string;
+                    t.Comp_score = (float)(double)dr["comp_score"];
+                    t.Engagement = (int)dr["engagement"];
+                    t.Tweet_text = dr["tweet_text"] as string;
+                    t.Tweet_time = (DateTime)dr["tweet_time"];
+                    
+                    t_list.Add(t);
+
+                }
+                return t_list;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+
+            }
+        }
+
+
+        public List<Login> get_logins(string email)
+        {
+            SqlConnection con = null;
+            List<Login> login_list = new List<Login>();
+
+            try
+            {
+                con = connect("DBConnectionString");
+                String selectSTR;
+                if (email == null || email == " ")
+                {
+                    selectSTR = "SELECT * FROM Logins_2022";
+                }
+                else selectSTR = "SELECT * FROM Logins_2022 WHERE email = '" + email+"'";
+
+                SqlCommand cmd = new SqlCommand(selectSTR, con);
+
+                // get a reader
+                SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+
+
+                while (dr.Read())
+                {
+                    Login li = new Login();
+                    li.Email = dr["email"] as string;
+                    li.Time = (DateTime)dr["time"];
+                    login_list.Add(li);
+
+                }
+                return login_list;
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+
+            }
+        }
 
         //  --    Assets    -- //
 

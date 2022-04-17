@@ -1,17 +1,14 @@
 ﻿using BackEndCointerest.Models;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.Cors;
 
 namespace BackEndCointerest.Controllers
 {
-    [EnableCors(origins: "*", headers: "*", methods: "*")]
-    public class CoinsController : ApiController
+    public class TweetsController : ApiController
     {
         // GET api/<controller>
         //public IEnumerable<string> Get()
@@ -22,24 +19,33 @@ namespace BackEndCointerest.Controllers
         // GET api/<controller>/5
         public IHttpActionResult Get()
         {
-            Coin coin = new Coin();
-            List<Coin> coins_list;
+            Tweet t = new Tweet();
+            List<Tweet> answer;
             try
             {
-               coins_list = coin.Get_Coins_with_latest_price_only();
-                return Ok(coins_list);
+              answer =  t.get();
             }
             catch (Exception ex)
             {
-                //return BadRequest(ex.Massage);
-                return Content(HttpStatusCode.BadRequest, ex);
+                return BadRequest("Error message: " + ex.Message);
             }
-
+            return Ok(answer);
         }
 
         // POST api/<controller>
-        public void Post([FromBody] string value)
+        public IHttpActionResult Post([FromBody] List<Tweet> tweets)
         {
+            Tweet t = new Tweet();
+            int amount;
+            try
+            {
+                amount = t.insert(tweets); 
+            }
+            catch(Exception ex)
+            {
+                return BadRequest("Error message: " + ex.Message);
+            }
+            return Ok("Ok - "+amount + " tweets were added to the db");
         }
 
         // PUT api/<controller>/5

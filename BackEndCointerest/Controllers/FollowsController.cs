@@ -45,7 +45,7 @@ namespace BackEndCointerest.Controllers
         //    User user = new User();
         //    try
         //    {
-        //        if (0== 0)
+        //        if (0 == 0)
         //        {
         //            return BadRequest("Email already exists in DB, try a new email");
         //        }

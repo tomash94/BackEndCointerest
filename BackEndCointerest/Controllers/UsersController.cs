@@ -15,9 +15,7 @@ namespace BackEndCointerest.Controllers
         // GET api/<controller>
         public IEnumerable<string> Get()
         {
-            CoinMarketCapLoop callback_coinsLoop = new CoinMarketCapLoop();
-
-            Task t1 = callback_coinsLoop.PeriodicFooAsync(600);
+            
             
            
             //while (true) { }

@@ -16,6 +16,12 @@ namespace BackEndCointerest
 
     public class CoinMarketCapLoop
     {
+        public CoinMarketCapLoop()
+        {
+
+        }
+
+
         private static string API_KEY = "f70ecc73-65a0-4947-a8a9-95ef0e273d1a";
 
         static string makeAPICall()
@@ -37,7 +43,7 @@ namespace BackEndCointerest
 
         }
 
-        static int api_func()
+        public async Task<List<Coin_update>> api_func()
         {
             try
             {
@@ -63,16 +69,16 @@ namespace BackEndCointerest
                 }
 
 
-                c_update.Insert(updates);
+               return updates;
 
 
             }
             catch (WebException e)
             {
                 Console.WriteLine(e.Message);
-                return 0;
+                return null;
             }
-            return 1;
+            return null;
         } 
 
 
@@ -82,7 +88,7 @@ namespace BackEndCointerest
             while (true)
             {
 
-                if (api_func() == 1)
+                if (1 == 1)
                 {
                     Thread.Sleep(1000*n);
                 }

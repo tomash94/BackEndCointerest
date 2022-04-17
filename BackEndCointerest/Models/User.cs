@@ -71,5 +71,11 @@ namespace BackEndCointerest.Models
             DBServices ds = new DBServices();
             return ds.check_follow(email, discover_user);
         }
+
+        public int login(string username, DateTime time)
+        {
+            DBServices ds = new DBServices();
+            return ds.login(username, time);
+        }
     }
 }
