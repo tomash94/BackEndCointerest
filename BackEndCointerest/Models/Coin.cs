@@ -46,17 +46,31 @@ namespace BackEndCointerest.Models
         }
 
 
-        public List<Coin> Get_Coins_with_all_prices()
-        {
-            DBServices ds = new DBServices();
-            List<Coin> coins = ds.Get_Coins_with_all_prices();
-            return coins;
-        }
+        //public List<Coin> Get_Coins_with_all_prices()
+        //{
+        //    DBServices ds = new DBServices();
+        //    List<Coin> coins = ds.Get_Coins_with_all_prices();
+        //    return coins;
+        //}
 
         public Coin GetCoin()
         {
             DBServices ds = new DBServices();
             return ds.get_coin_info(this.coin_name);
+        }
+
+        public List<Value_interval> graph_data(string coin_name, string interval_type, DateTime start, DateTime finish)
+        {
+            DBServices ds = new DBServices();
+            
+            return ds.get_hourly_graph_data(coin_name,interval_type,start,finish); 
+        }
+
+        public List<Graph_value_interval> get_comp(string coin_name, string interval_type, DateTime start, DateTime finish)
+        {
+            DBServices ds = new DBServices();
+
+            return ds.get_compound(coin_name, interval_type, start, finish);
         }
     }
 }

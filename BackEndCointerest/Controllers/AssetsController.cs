@@ -1,4 +1,5 @@
 ﻿using BackEndCointerest.Models;
+using BackEndCointerest.Models.DAL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,15 @@ namespace BackEndCointerest.Controllers
         {
             Asset ast = new Asset();
             List<Asset> asset_list;
+            List<Asset> returned_list = new List<Asset>();
             try
             {
                 asset_list = ast.get_assets_of_certain_user(email);
-                return Ok(asset_list);
+                foreach(Asset item in asset_list)
+                {
+                    if (item.Amount > 0.001) returned_list.Add(item);
+                }
+                return Ok(returned_list);
             }
             catch (Exception ex)
             {
@@ -31,17 +37,13 @@ namespace BackEndCointerest.Controllers
 
         public IHttpActionResult Get(string email, int n)
         {
-            Asset ast = new Asset();
-            List<Asset> asset_list;
+            Balance b = new Balance();
+            
             try
             {
-                asset_list = ast.get_assets_of_certain_user(email);
-                float balance = 0;
-                foreach(Asset ass in asset_list)
-                {
-                    balance += ass.Asset_worth_in_USD;
-                }
-                return Ok(balance);
+                b = b.get(email);
+                
+                return Ok(b);
             }
             catch (Exception ex)
             {

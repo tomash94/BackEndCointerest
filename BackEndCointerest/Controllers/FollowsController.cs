@@ -40,32 +40,28 @@ namespace BackEndCointerest.Controllers
         }
 
         // POST api/<controller>
-        //public IHttpActionResult Post(string email, string discover_user)
-        //{
-        //    User user = new User();
-        //    try
-        //    {
-        //        if (0 == 0)
-        //        {
-        //            return BadRequest("Email already exists in DB, try a new email");
-        //        }
-        //        else
-        //        {
-        //            //give the new user his allowance
-        //            Asset ast = new Asset("USD", user.Email, 100000);
-        //            if (user.Email == "i2cs2013@gmail.com" || user.Email == "hayun.ori@gmail.com")
-        //            {
-        //                ast.Amount = 9999999;
-        //            }
-        //            ast.Insert(ast);
-        //            return Created(new Uri(Request.RequestUri.AbsoluteUri + user.Username), user);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return Content(HttpStatusCode.BadRequest, ex);
-        //    }
-        //}
+        public IHttpActionResult Post(string email, string discover_user)
+        {
+            User user = new User();
+            Following f = new Following(email, discover_user);
+            
+
+            try
+            {
+                if (user.post_follow(f) == 1)
+                {
+                    return Ok(email+" Is now following "+discover_user);
+                }
+                else
+                {
+                    return BadRequest("Something went wrong with this action");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Error Message: " + ex.Message);
+            }
+        }
 
         // PUT api/<controller>/5
         public void Put(int id, [FromBody] string value)
@@ -73,8 +69,27 @@ namespace BackEndCointerest.Controllers
         }
 
         // DELETE api/<controller>/5
-        public void Delete(int id)
+        public IHttpActionResult Delete(string email, string discover_user)
         {
+            User user = new User();
+            Following f = new Following(email, discover_user);
+
+
+            try
+            {
+                if (user.Delete(f) == 1)
+                {
+                    return Ok(email + " Is now un-following " + discover_user);
+                }
+                else
+                {
+                    return BadRequest("Something went wrong with this action");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Error Message: " + ex.Message);
+            }
         }
     }
 }

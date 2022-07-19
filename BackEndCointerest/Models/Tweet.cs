@@ -42,7 +42,7 @@ namespace BackEndCointerest.Models
             DBServices dbs = new DBServices();
             foreach(Tweet t in tweets)
             {
-                t.Tweet_time = DateTime.Now;
+                
                 try
                 {
                     dbs.Insert(t);

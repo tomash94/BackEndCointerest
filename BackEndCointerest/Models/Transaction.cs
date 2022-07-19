@@ -17,11 +17,12 @@ namespace BackEndCointerest.Models
 
 
 
+
         //for printing out
         private string username;
         private string user_pic;
         private string coin_pic;
-
+        private string timeAgo;
 
         public Transaction()
         {
@@ -47,6 +48,7 @@ namespace BackEndCointerest.Models
         public string Username { get => username; set => username = value; }
         public string User_pic { get => user_pic; set => user_pic = value; }
         public string Coin_pic { get => coin_pic; set => coin_pic = value; }
+        public string TimeAgo { get => timeAgo; set => timeAgo = value; }
 
         public int Insert(Transaction trans)
         {
@@ -67,10 +69,45 @@ namespace BackEndCointerest.Models
             return ds.Get_transactions_of_certain_user(email);
         }
 
+        public List<Transaction> Get_transactions_of_certain_coin(string coin_name)// without specifying who the user is following
+        {
+            DBServices ds = new DBServices();
+
+            return ds.Get_transactions_of_coin(coin_name);
+        }
+
         public List<Transaction> Get_All_trans()
         {
             DBServices ds = new DBServices();
             return ds.get_all_transactions();
+        }
+
+        public List<Transaction> Get_trans_of_certain_coin(string email, string coin)
+        {
+            DBServices ds = new DBServices();
+            return ds.Get_transactions_of_coin(email, coin);
+        }
+
+        public int create_timeAgo_Str()
+        {
+            TimeSpan diff = DateTime.Now - t_date;
+            if(diff.TotalSeconds < 60)
+            {
+                TimeAgo = String.Format("{0:0}", diff.TotalSeconds)+ " seconds ago";
+                return 1;
+            }
+            if(diff.TotalMinutes < 60)
+            {
+                timeAgo = String.Format("{0:0}", diff.TotalMinutes) + " minutes ago";
+                return 1;
+            }
+            if(diff.TotalHours < 24)
+            {
+                timeAgo = String.Format("{0:0}", diff.TotalHours) + " hours ago";
+                return 1;
+            }
+            TimeAgo = String.Format("{0:0}", diff.TotalDays) + " days ago";
+            return 1;
         }
     }
 }

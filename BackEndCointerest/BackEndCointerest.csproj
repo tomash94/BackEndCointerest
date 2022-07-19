@@ -184,13 +184,19 @@
     <Compile Include="Models\Asset.cs" />
     <Compile Include="Models\Coin.cs" />
     <Compile Include="Models\Coin_update.cs" />
+    <Compile Include="Models\DAL\Balance.cs" />
     <Compile Include="Models\DAL\DBServices.cs" />
+    <Compile Include="Models\Following.cs" />
+    <Compile Include="Models\Graph_value_interval.cs" />
     <Compile Include="Models\Login.cs" />
     <Compile Include="Models\Prediction.cs" />
+    <Compile Include="Models\TopUser.cs" />
     <Compile Include="Models\Transaction.cs" />
     <Compile Include="Models\Tweet.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="coins_api.cs" />
+    <Compile Include="Models\value_interval.cs" />
+    <Compile Include="Models\Wallet_worth.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

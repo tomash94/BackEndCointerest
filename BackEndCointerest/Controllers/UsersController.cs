@@ -13,14 +13,7 @@ namespace BackEndCointerest.Controllers
     public class UsersController : ApiController
     {
         // GET api/<controller>
-        public IEnumerable<string> Get()
-        {
-            
-            
-           
-            //while (true) { }
-            return new string[] { "api callback loop inplace", "value2" };
-        }
+         
 
         // GET api/<controller>/5
         public IHttpActionResult Get(string email, string password)
@@ -86,9 +79,20 @@ namespace BackEndCointerest.Controllers
         public IHttpActionResult Get(string search)
         {
             List<User> user_list = new List<User>();
+            List<TopUser> t_list = new List<TopUser>();
             User back_user = new User();
             try
             {
+                if (string.IsNullOrEmpty(search))
+                {
+                    t_list = back_user.top_users();
+                    return Ok(t_list);
+                }
+                if(search == "*")
+                {
+                    return Ok(back_user.get_users());
+                }
+
                 user_list = back_user.search_users(search);
                 if (user_list[0] != null)
                 {
@@ -129,11 +133,13 @@ namespace BackEndCointerest.Controllers
                 {
                     //give the new user his allowance
                     Asset ast = new Asset("USD", user.Email, 100000);
-                    if (user.Email == "i2cs2013@gmail.com" || user.Email == "hayun.ori@gmail.com")
-                    {
-                        ast.Amount = 9999999;
-                    }
+                    
                     ast.Insert(ast);
+                    Transaction ts = new Transaction(ast.Email, ast.Coin_name, DateTime.Now, ast.Amount,   1, "Welcome to Cointerest app! invest wisely ;)");
+                    ts.Insert(ts);
+                    Wallet_worth wallet_worth = new Wallet_worth();
+                    wallet_worth.insert_new_user(user.Email);
+
                     return Created(new Uri(Request.RequestUri.AbsoluteUri + user.Username), user);
                 }
             }
@@ -169,9 +175,34 @@ namespace BackEndCointerest.Controllers
 
 
         // PUT api/<controller>/5
-        public void Put(int id, [FromBody] string value)
+        public IHttpActionResult Put(int id, string email, string value)
         {
+            if (string.IsNullOrEmpty(value))
+            {
+                return BadRequest("ERROR - the value is null or empty");
+            }
+            if(id == 0) //update bio
+            {
+                User u = new User();
+                try
+                {
+                    int n = u.update_bio(email, value);
+                    if(n == 1)
+                    {
+                        return Ok(" - Bio updated for " + email);
+                    }
+                    if (n == 0)
+                    {
+                        return BadRequest("ERROR - no email found in order to update the bio");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return Content(HttpStatusCode.BadRequest, ex);
+                }
+            }
 
+            return BadRequest("ERROR - no action set for id = " + id);
         }
 
         // DELETE api/<controller>/5

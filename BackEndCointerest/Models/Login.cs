@@ -27,5 +27,11 @@ namespace BackEndCointerest.Models
             DBServices db = new DBServices();
             return db.get_logins(email);
         }
+
+        public int insert()
+        {
+            DBServices db = new DBServices();
+            return db.Insert(this);
+        }
     }
 }

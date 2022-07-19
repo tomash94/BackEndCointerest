@@ -25,18 +25,30 @@ namespace BackEndCointerest
             GlobalConfiguration.Configure(WebApiConfig.Register);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
+           
+
             //initiallize a task to get the latest coin prices every 10 minutes through a task
             get_prices_thread.Start();
         }
 
         static async void MonitoringTimer()
         {
+            //coin prices
             CoinMarketCapLoop callback_coinsLoop = new CoinMarketCapLoop();
             
             Coin_update c_update = new Coin_update();
             List<Coin_update> updates = await callback_coinsLoop.api_func();
             c_update.Insert(updates);
 
+
+            //wallet worth
+            await Update_Wallets_Worth_Table();
+        }
+
+        static async Task <int> Update_Wallets_Worth_Table()
+        {
+            Wallet_worth w = new Wallet_worth();
+            return w.insert();
         }
 
         static void KeepAlive()

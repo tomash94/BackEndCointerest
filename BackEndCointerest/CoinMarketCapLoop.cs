@@ -55,6 +55,7 @@ namespace BackEndCointerest
                 {
                     if (item.name == "Bitcoin" || item.name == "Dogecoin" || item.name == "Carno" || item.name == "XRP" || item.name == "Ethereum" || item.name == "Solana" || item.name == "BNB" || item.name == "Polygon" || item.name == "Cosmos" || item.name == "NEAR Protocol")
                     {
+                        //add volume_24h 
                         c_update = new Coin_update();
                         c_update.Coin_name = item.name;
                         c_update.Coin_value = (float)item.quote.USD.price;
@@ -64,6 +65,7 @@ namespace BackEndCointerest
                         c_update.Percent_change_24h = (float)item.quote.USD.percent_change_24h;
                         c_update.Percent_change_30d = (float)item.quote.USD.percent_change_30d;
                         c_update.Percent_change_7d = (float)item.quote.USD.percent_change_7d;
+                        c_update.Volume_24h = (double)item.quote.USD.volume_24h;
                         updates.Add(c_update);
                     }
                 }
